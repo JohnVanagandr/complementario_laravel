@@ -24,6 +24,17 @@ class Post extends Model
   // Relaciones
 
   /**
+   * Relacion uno a muchos
+   */
+  /**
+   * Get the images for the blog post.
+   */
+  public function images()
+  {
+    return $this->hasMany(Image::class);
+  }
+
+  /**
    * uno a muchos inversa
    */
 
@@ -44,15 +55,14 @@ class Post extends Model
   }
 
   /**
+   * Relaciones mucho a muchos
+   */
+
+  /**
    * Get the post that the comment belongs to.
    */
   public function tags()
   {
     return $this->belongsToMany(Tag::class)->withTimestamps();
-  }
-
-  public function images()
-  {
-    return $this->belongsToMany(Image::class)->withTimestamps();
   }
 }

@@ -28,9 +28,9 @@ class PostController extends Controller
   public function create()
   {
     $users = User::pluck('name', "id");
-    $Category = Category::pluck("name", "id");
+    $categories = Category::pluck("name", "id");
     $tags = Tag::all();
-    return view("posts.create", compact("users", "Category", "tags"));
+    return view("posts.create", compact("users", "categories", "tags"));
   }
 
   /**
@@ -40,22 +40,16 @@ class PostController extends Controller
   {
     // Creamos el post y retornamos el modelo
     $post = Post::create($request->all());
+    $post->tags()->sync($request->tag_id);
     $archivos = $request->file;
-    $data = [];
     foreach ($archivos as $archivo) {
       // Creamos la imagen y retornamos el modelo
-      $img = Image::create([
+      Image::create([
         'name' => $archivo->getClientOriginalName(),
-        'path' => $archivo->store('/', 'post')
+        'path' => $archivo->store('/', 'post'),
+        'post_id' => $post->id
       ]);
-      // Push del id del modelo miren bien
-      array_push($data, $img->id);
     }
-    // Relacionamos el post con la imagenes
-    $post->images()->sync($data);
-
-    $post->tags()->sync($request->tag_id);
-
     return redirect()->route("posts.index");
   }
 
@@ -64,11 +58,17 @@ class PostController extends Controller
    */
   public function edit(string $id)
   {
-    $users = User::pluck('name', "id");
-    $Category = Category::pluck("name", "id");
+    // Consultamos el post por el id
     $post = Post::where("id", $id)->first();
-
-    return view("posts.edit", compact("users", "post", "Category"));
+    // Pasamos los tags a un arreglo
+    $users = User::pluck('name', "id");
+    // Pasamos las categorias a un arreglo
+    $categories = Category::pluck("name", "id");
+    // Listamos todos los tags
+    $tags = Tag::all();
+    // Listamos todos los tags relacionados al post
+    $post_tags = $post->tags;
+    return view("posts.edit", compact("users", "categories", "tags", "post", "post_tags"));
   }
 
   /**
@@ -76,11 +76,53 @@ class PostController extends Controller
    */
   public function update(PostRequest $request, string $id)
   {
-    $post = Post::where("id", $id)->first();
-
-    $post = $post->update($request->all());
-
-    return redirect()->route("posts.index");
+    try {
+      $post = Post::where("id", $id)->first();
+      // Actualizamos los datos del post
+      $post->update($request->all());
+      // Actualizamos los tags relacionados al post
+      $post->tags()->sync($request->tag_id);
+      // Preguntamos si la solicitud tiene imagenes asociadas.
+      if ($request->file('file')) {
+        // preguntamos si el modelo tiene alguna imagen relacionada
+        // Si tiene imagenes, las borramos y acutualizamos el registro con las nuevas imagenes
+        if ($post->images) {
+          // Recorremos las imagenes que tiene el post y eliminamos una a una
+          foreach ($post->images as $imagen) {
+            // Eliminamos del disco la imagen
+            Storage::disk("post")->delete($imagen->path);
+            // Eliminamos el modelo
+            $imagen->delete();
+          }
+          // Recorremos los archivos que llegan en la petición y creamos los nuevos registros
+          // Este codigo se repite y ya inicia a ser importante trabajar con algun patrón de diseño
+          foreach ($request->file as $archivo) {
+            // Creamos la imagen y retornamos el modelo
+            Image::create([
+              'name' => $archivo->getClientOriginalName(),
+              'path' => $archivo->store('/', 'post'),
+              'post_id' => $post->id
+            ]);
+          }
+        } else {
+          // Como el post no tiene imagenes, le asignamos las imagenes que llegan en la solicitud
+          // Recorremos los archivos que llegan en la petición y creamos los nuevos registros
+          // Este codigo se repite y ya inicia a ser importante trabajar con algun patrón de diseño
+          foreach ($request->file as $archivo) {
+            // Creamos la imagen y retornamos el modelo
+            Image::create([
+              'name' => $archivo->getClientOriginalName(),
+              'path' => $archivo->store('/', 'post'),
+              'post_id' => $post->id
+            ]);
+          }
+        }
+      }
+      return redirect()->route("posts.index");
+    } catch (\Exception $e) {
+      // Si quremos ver los errores, pero es importante no dejarlo en producción
+      dd($e);
+    }
   }
 
   /**
@@ -88,8 +130,18 @@ class PostController extends Controller
    */
   public function destroy(string $id)
   {
+    // Consultamos el Modelo
     $post = Post::where("id", $id)->first();
+    // Eliminamos la relación de los tags
     $post->tags()->detach();
+    // Recorremos las imagenes relacionadas al post
+    foreach ($post->images as $imagen) {
+      // Eliminamos del disco la imagen
+      Storage::disk("post")->delete($imagen->path);
+      // Eliminamos el modelo
+      $imagen->delete();
+    }
+    // Eliminamos el post
     $post->delete();
     return redirect()->route("posts.index");
   }

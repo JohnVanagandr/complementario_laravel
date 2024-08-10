@@ -1,4 +1,4 @@
-{{ html()->modelForm($post)->route('posts.update', $post->id)->open() }}
+{{ html()->modelForm($post)->route('posts.update', $post->id)->acceptsFiles()->open() }}
 
 @include('posts.partials.form')
 

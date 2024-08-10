@@ -29,13 +29,13 @@ Route::prefix('posts')->group(function () {
   Route::post("/destroy/{id}", [PostController::class, "destroy"])->name("posts.destroy");
 });
 
-Route::prefix('Category')->group(function () {
-  Route::get("/", [CategoriesController::class, "index"])->name("Category.index");
-  Route::get("/create", [CategoriesController::class, "create"])->name("Category.create");
-  Route::post("/store", [CategoriesController::class, "store"])->name("Category.store");
-  Route::get("/edit/{id}", [CategoriesController::class, "edit"])->name("Category.edit");
-  Route::post("/uppdate/{id}", [CategoriesController::class, "update"])->name("Category.update");
-  Route::post("/destroy/{id}", [CategoriesController::class, "destroy"])->name("Category.destroy");
+Route::prefix('categories')->group(function () {
+  Route::get("/", [CategoriesController::class, "index"])->name("categories.index");
+  Route::get("/create", [CategoriesController::class, "create"])->name("categories.create");
+  Route::post("/store", [CategoriesController::class, "store"])->name("categories.store");
+  Route::get("/edit/{id}", [CategoriesController::class, "edit"])->name("categories.edit");
+  Route::post("/uppdate/{id}", [CategoriesController::class, "update"])->name("categories.update");
+  Route::post("/destroy/{id}", [CategoriesController::class, "destroy"])->name("categories.destroy");
 });
 
 Route::prefix('tags')->group(function () {

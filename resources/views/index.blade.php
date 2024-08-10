@@ -11,9 +11,9 @@
 <body>
 
     <a href="{{ route('users.index') }}">Usuarios</a>
-    <a href="{{ route('Category.index') }}">Categorias</a>
-    <a href="{{ route('posts.index') }}">Posts</a>
+    <a href="{{ route('categories.index') }}">Categorias</a>
     <a href="{{ route('tags.index') }}">Tags</a>
+    <a href="{{ route('posts.index') }}">Posts</a>
 
 </body>
 

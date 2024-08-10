@@ -1,6 +1,6 @@
-{{ html()->modelForm($category)->route('Category.update', $category->id)->open() }}
+{{ html()->modelForm($category)->route('categories.update', $category->id)->open() }}
 
-@include('Category.partials.form')
+@include('category.partials.form')
 
 <button type="submit">Editar</button>
 

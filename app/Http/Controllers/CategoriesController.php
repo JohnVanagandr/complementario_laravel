@@ -12,8 +12,8 @@ class CategoriesController extends Controller
    */
   public function index()
   {
-    $Category = Category::paginate(10);
-    return view("Category.index", compact("Category"));
+    $categories = Category::paginate(10);
+    return view("category.index", compact("categories"));
   }
 
   /**
@@ -21,7 +21,7 @@ class CategoriesController extends Controller
    */
   public function create()
   {
-    return view("Category.create");
+    return view("category.create");
   }
 
   /**
@@ -31,7 +31,7 @@ class CategoriesController extends Controller
   {
     $category = Category::create($request->all());
 
-    return redirect()->route("Category.edit", $category->id);
+    return redirect()->route("categories.edit", $category->id);
   }
 
   /**
@@ -41,7 +41,7 @@ class CategoriesController extends Controller
   {
     $category = Category::where("id", $id)->first();
 
-    return view("Category.edit", compact("category"));
+    return view("category.edit", compact("category"));
   }
 
   /**
@@ -53,7 +53,7 @@ class CategoriesController extends Controller
 
     $category->update($request->all());
 
-    return redirect()->route("Category.index");
+    return redirect()->route("categories.index");
   }
 
   /**
@@ -63,6 +63,6 @@ class CategoriesController extends Controller
   {
     $category = Category::where("id", $id)->first();
     $category->delete();
-    return redirect()->route("Category.index");
+    return redirect()->route("categories.index");
   }
 }

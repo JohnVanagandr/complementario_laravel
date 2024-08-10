@@ -5,7 +5,7 @@
     @enderror
 </div>
 <div>
-    {{ html()->select('category_id', $Category)->placeholder('Seleccione...') }}
+    {{ html()->select('category_id', $categories)->placeholder('Seleccione...') }}
     @error('category_id')
         {{ $message }}
     @enderror
@@ -27,7 +27,7 @@
 </div>
 <div>
     @foreach ($tags as $tag)
-        {{ html()->checkbox('tag_id[]', null, $tag->id)->id('tag_' . $tag->id) }}
+        {{ html()->checkbox('tag_id[]', isset($post_tags) && $post_tags->contains($tag->id) ? true : false, $tag->id)->id('tag_' . $tag->id) }}
         {{ html()->label($tag->name, 'tag_' . $tag->id) }}
     @endforeach
 </div>

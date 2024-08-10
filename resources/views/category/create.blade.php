@@ -1,6 +1,6 @@
-{{ html()->form()->route('Category.store')->open() }}
+{{ html()->form()->route('categories.store')->open() }}
 
-@include('Category.partials.form')
+@include('category.partials.form')
 
 <button type="submit">Guardar</button>
 
