@@ -1,7 +1,13 @@
-{{ html()->modelForm($tag)->route('tags.update', $tag->id)->open() }}
+<x-app-layout>
 
-@include('tags.partials.form')
+    @section('content')
+        {{ html()->modelForm($tag)->route('tags.update', $tag->id)->open() }}
 
-<button type="submit">Editar</button>
+        @include('tags.partials.form')
 
-{{ html()->closeModelForm() }}
+        <button type="submit">Editar</button>
+
+        {{ html()->closeModelForm() }}
+    @endsection
+
+</x-app-layout>

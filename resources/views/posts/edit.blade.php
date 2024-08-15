@@ -1,7 +1,13 @@
-{{ html()->modelForm($post)->route('posts.update', $post->id)->acceptsFiles()->open() }}
+<x-app-layout>
 
-@include('posts.partials.form')
+    @section('content')
+        {{ html()->modelForm($post)->route('posts.update', $post->id)->acceptsFiles()->open() }}
 
-<button type="submit">Editar</button>
+        @include('posts.partials.form')
 
-{{ html()->closeModelForm() }}
+        <button type="submit">Editar</button>
+
+        {{ html()->closeModelForm() }}
+    @endsection
+
+</x-app-layout>
