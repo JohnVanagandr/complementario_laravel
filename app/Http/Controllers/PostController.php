@@ -13,12 +13,20 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('can:posts.index')->only('index');
+    $this->middleware('can:posts.create')->only('create', 'store');
+    $this->middleware('can:posts.edit')->only('edit', 'update');
+    $this->middleware('can:posts.destroy')->only('destroy');
+  }
+
   /**
    * Display a listing of the resource.
    */
   public function index()
   {
-    $posts = Post::paginate(4);
+    $posts = Post::paginate(10);
     return view("posts.index", compact("posts"));
   }
 
@@ -38,19 +46,23 @@ class PostController extends Controller
    */
   public function store(PostRequest $request)
   {
-    // Creamos el post y retornamos el modelo
-    $post = Post::create($request->all());
-    $post->tags()->sync($request->tag_id);
-    $archivos = $request->file;
-    foreach ($archivos as $archivo) {
-      // Creamos la imagen y retornamos el modelo
-      Image::create([
+    try {
+      // Creamos el post y retornamos el modelo
+      $post = Post::create($request->all());
+      $post->tags()->sync($request->tag_id);
+      $archivos = $request->file('file');
+      foreach ($archivos as $archivo) {
+        // Creamos la imagen y retornamos el modelo
+        Image::create([
         'name' => $archivo->getClientOriginalName(),
         'path' => $archivo->store('/', 'post'),
         'post_id' => $post->id
-      ]);
+        ]);
+      }
+      return redirect()->route("posts.index");
+    } catch (\Exception $e) {
+      dd($e);
     }
-    return redirect()->route("posts.index");
   }
 
   /**

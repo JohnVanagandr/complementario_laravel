@@ -1,3 +1,9 @@
+<x-app-layout>
+
+    @section('content')
+
+    <div class="container">
+
 <a href="{{ route('categories.create') }}">Nuevo</a>
 
 <table border="1">
@@ -22,3 +28,9 @@
         @endforelse
     </tbody>
 </table>
+
+    </div>
+
+@endsection
+
+</x-app-layout>
