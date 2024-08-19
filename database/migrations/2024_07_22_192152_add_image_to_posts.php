@@ -12,8 +12,8 @@ return new class extends Migration
   public function up(): void
   {
     Schema::table('images', function (Blueprint $table) {
-      $table->unsignedBigInteger('post_id')->after('name');
-      $table->foreign('post_id')->references('id')->on('posts');
+      // $table->unsignedBigInteger('post_id')->after('name');
+      // $table->foreign('post_id')->references('id')->on('posts');
     });
   }
 
@@ -23,7 +23,8 @@ return new class extends Migration
   public function down(): void
   {
     Schema::table('images', function (Blueprint $table) {
-      $table->dropColumn('posts_id');
+      // $table->dropForeign('images_post_id_foreign');
+      // $table->dropColumn('post_id');
     });
   }
 };

@@ -1,13 +1,26 @@
 <x-app-layout>
 
     @section('content')
-        {{ html()->modelForm($tag)->route('tags.update', $tag->id)->open() }}
+        <div class="container">
 
-        @include('tags.partials.form')
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
 
-        <button type="submit">Editar</button>
+                        <div class="card-body">
+                            {{ html()->modelForm($tag, 'PUT')->route('tags.update', $tag->id)->open() }}
 
-        {{ html()->closeModelForm() }}
-    @endsection
+                            @include('tags.partials.form')
+
+                            <button type="submit" class="btn btn-outline-dark">Editar</button>
+
+                            {{ html()->closeModelForm() }}
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        @endsection
 
 </x-app-layout>

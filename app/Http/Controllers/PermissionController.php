@@ -7,15 +7,21 @@ use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('auth');
+    $this->middleware('can:permissions.index')->only('index');
+    $this->middleware('can:permissions.create')->only('create', 'store');
+    $this->middleware('can:permissions.edit')->only('edit', 'update');
+    $this->middleware('can:permissions.destroy')->only('destroy');
+  }
   /**
    * Display a listing of the resource.
    */
   public function index()
   {
     $permissions = Permission::paginate(10);
-    dd($permissions);
-    // $permiso = Permission::create(['name' => "John"]);
-    // dd($permiso);
+    return view('permissions.index', compact('permissions'));
   }
 
   /**
@@ -23,43 +29,41 @@ class PermissionController extends Controller
    */
   public function create()
   {
-    //
+    return view('permissions.create');
   }
 
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request) {}
-
-  /**
-   * Display the specified resource.
-   */
-  public function show(string $id)
+  public function store(Request $request)
   {
-    //
+    Permission::create($request->all());
+    return redirect()->route("permissions.index");
   }
 
   /**
    * Show the form for editing the specified resource.
    */
-  public function edit(string $id)
+  public function edit(Permission $permission)
   {
-    //
+    return view('permissions.edit', compact('permission'));
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, string $id)
+  public function update(Request $request, Permission $permission)
   {
-    //
+    $permission->update($request->all());
+    return redirect()->route("permissions.index");
   }
 
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy(string $id)
+  public function destroy(Permission $permission)
   {
-    //
+    $permission->delete();
+    return redirect()->route("permissions.index");
   }
 }

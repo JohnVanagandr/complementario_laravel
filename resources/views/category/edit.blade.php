@@ -1,7 +1,27 @@
-{{ html()->modelForm($category)->route('categories.update', $category->id)->open() }}
+<x-app-layout>
 
-@include('category.partials.form')
+    @section('content')
+        <div class="container">
 
-<button type="submit">Editar</button>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
 
-{{ html()->closeModelForm() }}
+                        <div class="card-body">
+
+                            {{ html()->modelForm($category, 'PUT')->route('categories.update', $category->id)->open() }}
+
+                            @include('category.partials.form')
+
+                            <button type="submit" class="btn btn-outline-dark">Editar</button>
+
+                            {{ html()->closeModelForm() }}
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        @endsection
+
+</x-app-layout>

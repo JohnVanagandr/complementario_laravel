@@ -1,7 +1,26 @@
-{{ html()->form()->route('tags.store')->open() }}
+<x-app-layout>
 
-@include('tags.partials.form')
+    @section('content')
+        <div class="container">
 
-<button type="submit">Guardar</button>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
 
-{{ html()->form()->close() }}
+                        <div class="card-body">
+                            {{ html()->form()->route('tags.store')->open() }}
+
+                            @include('tags.partials.form')
+
+                            <button type="submit" class="btn btn-outline-dark">Guardar</button>
+
+                            {{ html()->form()->close() }}
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        @endsection
+
+</x-app-layout>

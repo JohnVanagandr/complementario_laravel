@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreUserRequest extends FormRequest
+class UserRequest extends FormRequest
 {
   /**
    * Determine if the user is authorized to make this request.
@@ -22,9 +22,7 @@ class StoreUserRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'name' => 'required|max:255',
-      'email' => 'required|email|unique:users|max:255',
-      'password' => 'required|max:255',
+      // 'name' => 'required|max:255',
     ];
   }
 
@@ -38,7 +36,6 @@ class StoreUserRequest extends FormRequest
     return [
       'name.required' => 'El :attribute es requerido',
       'name.max' => 'Solo puede ingresar un maximo de 255 caracteres',
-      'email.required' => 'El campo :attribute es requerido',
     ];
   }
 
@@ -50,7 +47,7 @@ class StoreUserRequest extends FormRequest
   public function attributes(): array
   {
     return [
-      'email' => 'correo electrónico',
+      'name' => 'Nombre usuario',
     ];
   }
 }

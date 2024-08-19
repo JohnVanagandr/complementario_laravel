@@ -15,8 +15,8 @@ return new class extends Migration
       $table->id();
       $table->unsignedBigInteger('post_id')->nullable();
       $table->unsignedBigInteger('tag_id')->nullable();
-      $table->foreign('post_id')->references('id')->on('posts');
-      $table->foreign('tag_id')->references('id')->on('tags');
+      $table->foreign('post_id')->references('id')->on('posts')->nullOnDelete();
+      $table->foreign('tag_id')->references('id')->on('tags')->nullOnDelete();
       $table->timestamps();
     });
   }

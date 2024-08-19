@@ -21,17 +21,35 @@ class Post extends Model
     'category_id'
   ];
 
+  /**
+   * Disk donde se guardan archivos asociados
+   *
+   * @var string
+   */
+  public $disk = 'post';
+
   // Relaciones
 
+  // /**
+  //  * Relacion uno a muchos
+  //  */
+  // /**
+  //  * Get the images for the blog post.
+  //  */
+  // public function images()
+  // {
+  //   return $this->hasMany(Image::class);
+  // }
+
   /**
-   * Relacion uno a muchos
+   * =====================================
+   * Relaciones uno a muchos polimorfica
+   * =====================================
    */
-  /**
-   * Get the images for the blog post.
-   */
+
   public function images()
   {
-    return $this->hasMany(Image::class);
+    return $this->morphMany(Image::class, 'imageable');
   }
 
   /**

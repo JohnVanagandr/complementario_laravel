@@ -7,6 +7,14 @@ use App\Http\Requests\TagRequest;
 
 class TagController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('auth');
+    $this->middleware('can:tags.index')->only('index');
+    $this->middleware('can:tags.create')->only('create', 'store');
+    $this->middleware('can:tags.edit')->only('edit', 'update');
+    $this->middleware('can:tags.destroy')->only('destroy');
+  }
   /**
    * Display a listing of the resource.
    */
@@ -32,37 +40,31 @@ class TagController extends Controller
   {
     $tag = Tag::create($request->all());
 
-    return redirect()->route("tags.edit", $tag->id);
+    return redirect()->route("tags.index",);
   }
 
   /**
    * Show the form for editing the specified resource.
    */
-  public function edit($id)
+  public function edit(Tag $tag)
   {
-    $tag = Tag::where("id", $id)->first();
-
     return view("tags.edit", compact("tag"));
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(TagRequest $request, $id)
+  public function update(TagRequest $request, Tag $tag)
   {
-    $tag = Tag::where("id", $id)->first();
-
     $tag->update($request->all());
-
     return redirect()->route("tags.index");
   }
 
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy($id)
+  public function destroy(Tag $tag)
   {
-    $tag = Tag::where("id", $id)->first();
     $tag->delete();
     return redirect()->route("tags.index");
   }
@@ -72,7 +74,6 @@ class TagController extends Controller
   {
     $tag = Tag::where("id", $id)->first();
     $posts = $tag->post()->paginate(10);
-    dd($posts);
     // retornamos la vista de los post que tiene ese tag
   }
 }

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,5 +22,12 @@ class AppServiceProvider extends ServiceProvider
   public function boot(): void
   {
     Paginator::useBootstrapFive();
+
+    // Implicitly grant "Super-Admin" role all permission checks using can()
+    Gate::before(function ($user, $ability) {
+      if ($user->hasRole('Super-Admin')) {
+        return true;
+      }
+    });
   }
 }

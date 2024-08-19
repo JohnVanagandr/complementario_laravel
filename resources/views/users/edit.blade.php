@@ -1,7 +1,26 @@
-{{ html()->modelForm($user)->route('users.update', $user->id)->open() }}
+<x-app-layout>
 
-@include('users.partials.form')
+    @section('content')
+        <div class="container">
 
-<button type="submit">Editar</button>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
 
-{{ html()->closeModelForm() }}
+                        <div class="card-body">
+
+                            {{ html()->modelForm($user, 'PUT')->route('users.update', $user->id)->open() }}
+
+                            @include('users.partials.form')
+
+                            <button type="submit" class="btn btn-outline-dark">Editar</button>
+
+                            {{ html()->closeModelForm() }}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endsection
+
+</x-app-layout>

@@ -1,7 +1,26 @@
 <x-app-layout>
 
     @section('content')
-        
-    @endsection
+        <div class="container">
+
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+
+                        <div class="card-body">
+
+                            {{ html()->modelForm($role, 'PUT')->route('roles.update', $role->id)->open() }}
+
+                            @include('roles.partials.form')
+
+                            <button type="submit" class="btn btn-outline-dark">Editar</button>
+
+                            {{ html()->closeModelForm() }}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endsection
 
 </x-app-layout>

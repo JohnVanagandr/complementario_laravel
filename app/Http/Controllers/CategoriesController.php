@@ -7,6 +7,14 @@ use App\Http\Requests\CategoryRequest;
 
 class CategoriesController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('auth');
+    $this->middleware('can:categories.index')->only('index');
+    $this->middleware('can:categories.create')->only('create', 'store');
+    $this->middleware('can:categories.edit')->only('edit', 'update');
+    $this->middleware('can:categories.destroy')->only('destroy');
+  }
   /**
    * Display a listing of the resource.
    */
@@ -31,37 +39,31 @@ class CategoriesController extends Controller
   {
     $category = Category::create($request->all());
 
-    return redirect()->route("categories.edit", $category->id);
+    return redirect()->route("categories.index");
   }
 
   /**
    * Show the form for editing the specified resource.
    */
-  public function edit($id)
+  public function edit(Category $category)
   {
-    $category = Category::where("id", $id)->first();
-
     return view("category.edit", compact("category"));
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(CategoryRequest $request, $id)
+  public function update(CategoryRequest $request, Category $category)
   {
-    $category = Category::where("id", $id)->first();
-
     $category->update($request->all());
-
     return redirect()->route("categories.index");
   }
 
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy($id)
+  public function destroy(Category $category)
   {
-    $category = Category::where("id", $id)->first();
     $category->delete();
     return redirect()->route("categories.index");
   }

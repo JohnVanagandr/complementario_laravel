@@ -4,17 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
 use App\Models\Category;
-use App\Models\Image;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Services\FileService;
+use App\Services\PostService;
 
 class PostController extends Controller
 {
-  public function __construct()
-  {
+  protected $postService;
+  protected $fileService;
+
+  public function __construct(
+    PostService $postService,
+    FileService $fileService
+  ) {
+    $this->fileService = $fileService;
+    $this->postService = $postService;
+    // Iniciamos todas la validaciones de la clase y las asignamos al método o métodos
+    $this->middleware('auth');
     $this->middleware('can:posts.index')->only('index');
     $this->middleware('can:posts.create')->only('create', 'store');
     $this->middleware('can:posts.edit')->only('edit', 'update');
@@ -26,7 +34,7 @@ class PostController extends Controller
    */
   public function index()
   {
-    $posts = Post::paginate(10);
+    $posts = $this->postService->list();
     return view("posts.index", compact("posts"));
   }
 
@@ -47,18 +55,9 @@ class PostController extends Controller
   public function store(PostRequest $request)
   {
     try {
-      // Creamos el post y retornamos el modelo
-      $post = Post::create($request->all());
-      $post->tags()->sync($request->tag_id);
-      $archivos = $request->file('file');
-      foreach ($archivos as $archivo) {
-        // Creamos la imagen y retornamos el modelo
-        Image::create([
-        'name' => $archivo->getClientOriginalName(),
-        'path' => $archivo->store('/', 'post'),
-        'post_id' => $post->id
-        ]);
-      }
+      // Llamamos el servicio para crear el post
+      $this->postService->store($request);
+      // Redireccionamos al usuario a la lista de todos los post
       return redirect()->route("posts.index");
     } catch (\Exception $e) {
       dd($e);
@@ -68,10 +67,9 @@ class PostController extends Controller
   /**
    * Show the form for editing the specified resource.
    */
-  public function edit(string $id)
+  public function edit(Post $post)
   {
-    // Consultamos el post por el id
-    $post = Post::where("id", $id)->first();
+    $this->authorize('view', $post);
     // Pasamos los tags a un arreglo
     $users = User::pluck('name', "id");
     // Pasamos las categorias a un arreglo
@@ -86,50 +84,12 @@ class PostController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(PostRequest $request, string $id)
+  public function update(PostRequest $request, Post $post)
   {
     try {
-      $post = Post::where("id", $id)->first();
-      // Actualizamos los datos del post
-      $post->update($request->all());
-      // Actualizamos los tags relacionados al post
-      $post->tags()->sync($request->tag_id);
-      // Preguntamos si la solicitud tiene imagenes asociadas.
-      if ($request->file('file')) {
-        // preguntamos si el modelo tiene alguna imagen relacionada
-        // Si tiene imagenes, las borramos y acutualizamos el registro con las nuevas imagenes
-        if ($post->images) {
-          // Recorremos las imagenes que tiene el post y eliminamos una a una
-          foreach ($post->images as $imagen) {
-            // Eliminamos del disco la imagen
-            Storage::disk("post")->delete($imagen->path);
-            // Eliminamos el modelo
-            $imagen->delete();
-          }
-          // Recorremos los archivos que llegan en la petición y creamos los nuevos registros
-          // Este codigo se repite y ya inicia a ser importante trabajar con algun patrón de diseño
-          foreach ($request->file as $archivo) {
-            // Creamos la imagen y retornamos el modelo
-            Image::create([
-              'name' => $archivo->getClientOriginalName(),
-              'path' => $archivo->store('/', 'post'),
-              'post_id' => $post->id
-            ]);
-          }
-        } else {
-          // Como el post no tiene imagenes, le asignamos las imagenes que llegan en la solicitud
-          // Recorremos los archivos que llegan en la petición y creamos los nuevos registros
-          // Este codigo se repite y ya inicia a ser importante trabajar con algun patrón de diseño
-          foreach ($request->file as $archivo) {
-            // Creamos la imagen y retornamos el modelo
-            Image::create([
-              'name' => $archivo->getClientOriginalName(),
-              'path' => $archivo->store('/', 'post'),
-              'post_id' => $post->id
-            ]);
-          }
-        }
-      }
+      // Llamamos al servcio para actualizar el post
+      $this->postService->update($request, $post);
+      // Redireccionamos a la ruta index
       return redirect()->route("posts.index");
     } catch (\Exception $e) {
       // Si quremos ver los errores, pero es importante no dejarlo en producción
@@ -140,21 +100,11 @@ class PostController extends Controller
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy(string $id)
+  public function destroy(Post $post)
   {
-    // Consultamos el Modelo
-    $post = Post::where("id", $id)->first();
-    // Eliminamos la relación de los tags
-    $post->tags()->detach();
-    // Recorremos las imagenes relacionadas al post
-    foreach ($post->images as $imagen) {
-      // Eliminamos del disco la imagen
-      Storage::disk("post")->delete($imagen->path);
-      // Eliminamos el modelo
-      $imagen->delete();
-    }
-    // Eliminamos el post
-    $post->delete();
+    // Llamamos el servicio para eliminara el posr
+    $this->postService->delete($post);
+
     return redirect()->route("posts.index");
   }
 }

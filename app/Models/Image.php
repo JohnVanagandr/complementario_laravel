@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Accessors\ImageAccessors;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Image extends Model
 {
-  use HasFactory;
+  use HasFactory, ImageAccessors;
 
   /**
    * The attributes that are mass assignable.
@@ -19,11 +20,19 @@ class Image extends Model
   protected $fillable = [
     'name',
     'path',
-    'post_id'
+    'disk',
+    'imageable_id',
+    'imageable_type'
   ];
 
-  protected function getNuevoAttribute()
+  /**
+   * ===============================
+   * Relaciones polimorficas
+   * ===============================
+   */
+
+  public function imageable()
   {
-    return Storage::disk('post')->url($this->path);
+    return $this->morphTo();
   }
 }
